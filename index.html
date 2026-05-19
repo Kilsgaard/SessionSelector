@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Session Selector</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-shape bg-shape-a"></div>
+  <div class="bg-shape bg-shape-b"></div>
+
+  <main class="app-shell">
+    <header class="hero">
+      <p class="eyebrow">Data Platform Next Step 2026</p>
+      <h1>Vaelg Dine Breakout Sessions</h1>
+      <p class="hero-text">
+        Appen henter sessions fra konferencens side, gemmer data lokalt i din browser,
+        og lader dig kun vaelge en session pr. tidsinterval.
+      </p>
+
+      <div class="hero-actions">
+        <button id="refreshBtn" class="btn btn-primary" type="button">Opdater fra web</button>
+        <button id="clearBtn" class="btn btn-ghost" type="button">Nulstil mine valg</button>
+      </div>
+
+      <p id="status" class="status" aria-live="polite"></p>
+    </header>
+
+    <section class="toolbar" aria-label="Filtre og visning">
+      <div class="tab-group" role="tablist" aria-label="Visning">
+        <button id="tabSelected" class="tab active" role="tab" aria-selected="true" aria-controls="selectedPanel" type="button">Forside: Mine sessions</button>
+        <button id="tabAll" class="tab" role="tab" aria-selected="false" aria-controls="allPanel" type="button">Alle sessions</button>
+      </div>
+
+      <label class="search-wrap" for="searchInput">
+        <span>Soeg i titel og beskrivelse</span>
+        <input id="searchInput" type="search" placeholder="fx governance, spark, performance" />
+      </label>
+
+      <label class="filter-wrap" for="timeFilter">
+        <span>Tidsinterval</span>
+        <select id="timeFilter">
+          <option value="all">Alle</option>
+        </select>
+      </label>
+    </section>
+
+    <section id="selectedPanel" class="panel" role="tabpanel" aria-labelledby="tabSelected"></section>
+    <section id="allPanel" class="panel hidden" role="tabpanel" aria-labelledby="tabAll"></section>
+  </main>
+
+  <template id="sessionCardTemplate">
+    <article class="session-card">
+      <div class="session-meta">
+        <span class="time"></span>
+        <span class="room"></span>
+      </div>
+      <h2 class="title"></h2>
+      <p class="description"></p>
+      <label class="pick-wrap">
+        <input class="pick" type="checkbox" />
+        <span>Vaelg denne session</span>
+      </label>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
