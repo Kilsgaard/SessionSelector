@@ -255,11 +255,62 @@ function normalizeSessions(input) {
       time: String(item.time || "Ukendt tid").replace(/\s+/g, " ").trim(),
       slotKey: buildSlotKey(String(item.time || ""))
     }))
-    .sort((a, b) => a.time.localeCompare(b.time) || a.room.localeCompare(b.room));
+    .sort((a, b) => compareByTimeThenRoom(a.time, b.time) || a.room.localeCompare(b.room) || a.title.localeCompare(b.title));
 }
 
 function buildSlotKey(timeText) {
   return timeText.toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+function compareByTimeThenRoom(timeA, timeB) {
+  const dayA = parseDayIndex(timeA);
+  const dayB = parseDayIndex(timeB);
+  if (dayA !== dayB) {
+    return dayA - dayB;
+  }
+
+  const startA = parseStartMinutes(timeA);
+  const startB = parseStartMinutes(timeB);
+  if (startA !== startB) {
+    return startA - startB;
+  }
+
+  return String(timeA).localeCompare(String(timeB));
+}
+
+function parseDayIndex(timeText) {
+  const dayToken = String(timeText || "").trim().split(" ")[0].toLowerCase();
+  const dayOrder = {
+    mon: 1,
+    tue: 2,
+    wed: 3,
+    thu: 4,
+    fri: 5,
+    sat: 6,
+    sun: 7
+  };
+
+  return dayOrder[dayToken] || 99;
+}
+
+function parseStartMinutes(timeText) {
+  const match = String(timeText || "").match(/(\d{1,2}):(\d{2})\s*(am|pm)/i);
+  if (!match) {
+    return Number.MAX_SAFE_INTEGER;
+  }
+
+  let hour = Number(match[1]);
+  const minute = Number(match[2]);
+  const meridiem = match[3].toLowerCase();
+
+  if (hour === 12) {
+    hour = 0;
+  }
+  if (meridiem === "pm") {
+    hour += 12;
+  }
+
+  return hour * 60 + minute;
 }
 
 function setTab(tabName) {
@@ -328,7 +379,8 @@ function enforceUniqueTimeSlots() {
 
 function fillTimeFilter() {
   const oldValue = state.timeFilter;
-  const times = Array.from(new Set(state.sessions.map((s) => s.time))).sort((a, b) => a.localeCompare(b));
+  const times = Array.from(new Set(state.sessions.map((s) => s.time)))
+    .sort((a, b) => compareByTimeThenRoom(a, b));
 
   timeFilter.innerHTML = "<option value=\"all\">Alle</option>";
   for (const time of times) {
